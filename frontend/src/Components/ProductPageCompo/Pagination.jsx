@@ -1,9 +1,10 @@
 import { Box, Button } from '@chakra-ui/react'
-import React, { useEffect, useState } from 'react'
+import React, { useContext, useEffect, useState } from 'react'
 import {useSearchParams} from "react-router-dom"
 import {useDispatch,useSelector} from "react-redux"
 import { getProducts } from '../../Redux/ProductPageRedux/prodActions'
 import styles from "../../Pages/Products/styles.module.css"
+import filterContext from '../../Context/Contextfilter'
 import { ArrowLeftIcon, ArrowRightIcon } from '@chakra-ui/icons'
 let lastPage=4
 const getCurrentPage=(value)=>{
@@ -18,13 +19,15 @@ const Pagination = () => {
   let [searchParams,setSearchParams]=useSearchParams()
   const extractPage=getCurrentPage(+searchParams.get('page'))
   const [page,setPage]=useState(extractPage)
-  
-  
+  const {State,setState,AddFilters}=useContext(filterContext)
+  console.log(AddFilters)
   useEffect(()=>{
     setSearchParams({page})
+    AddFilters({...State,page:page})
     dispatch(getProducts(page))
-
+    
   },[page])
+  
 
   const handlePageChange=(updatedPage)=>{
     setPage(updatedPage)

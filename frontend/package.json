@@ -54,5 +54,8 @@
       "last 1 safari version"
     ]
   },
-  "Homepage": "."
+  "Homepage": ".",
+  "devDependencies": {
+    "terser-brunch": "^4.1.0"
+  }
 }

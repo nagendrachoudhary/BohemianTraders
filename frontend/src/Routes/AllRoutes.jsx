@@ -10,12 +10,13 @@ import Payment from "../Pages/Payment/Payment"
 import Account from '../Pages/YourAccount/Account';
 import WishList from '../Pages/WishList/WishList';
 import Order from '../Pages/Order/Order';
+import Address from '../Pages/Address/Address';
 const AllRoutes = () => {
   return (
     <Routes>
      <Route path="/" element={<Home1/>} />
       <Route path="/products" element={<Products/>} />
-      <Route path="/products/:id" element={<ProductDetail/>} />
+      <Route path="/product/:id" element={<ProductDetail/>} />
       <Route path="/login" element={<Login />}></Route>
       <Route path="/signUp" element={<SignUp />}></Route>
       <Route path='/cart' element={<Cart/>} />
@@ -23,6 +24,7 @@ const AllRoutes = () => {
       <Route path='/account' element={<Account/>}>
         <Route path='wishlist' element={<WishList/>} />
         <Route path='orders' element={<Order/>}/>
+        <Route path='addresses' element={<Address/>}/>
         <Route path='*' element={'Not found'} />
       </Route>
     </Routes>

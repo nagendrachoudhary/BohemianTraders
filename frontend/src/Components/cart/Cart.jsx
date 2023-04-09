@@ -17,6 +17,7 @@ import {Box } from "@chakra-ui/react"
 // Modals
 import { useToast } from "@chakra-ui/react";
 import axios from "axios"
+import { GetDataInCart, PatchDataInCart } from "../../Api";
 
 
 const Cart = () => {
@@ -50,18 +51,22 @@ const Cart = () => {
   // When cart is empty this content will be shown
 
 const fetchdata=()=>{
-  fetch(`${accountsUrl}?login=true`)
-  .then((res)=> res.json())
-  .then((data)=>{
-    setCount(data[0])
-    console.log("user in cart Page-> ",data[0].cart);
-    setCart(data[0].cart)
+  GetDataInCart().then((data)=>{
+    setCount(data.data)
+    console.log("user in cart Page-> ",data.data);
+    setCart(data.data)
 
   })
 }
+const [render,setrender]=useState(null)
+const handleQuantityChange=((id,oprection,product)=>{
+PatchDataInCart(id,oprection).then((res)=>{
+  setrender(res.data)
+})
+})
 useEffect(()=>{
    fetchdata();
-},[])
+},[render])
 
 let total= cart.reduce((acc,ele)=>{
   return acc +(ele.price * ele.quantity)
@@ -104,25 +109,6 @@ let taxPrice=10
       </Box>
     );
   }
-let quantity=1
-const handleQuantityChange=((payload,id)=>{
-  if(payload<1){return}
-  let cartNew= cart.filter((ele)=>{   
-      if(ele.id===id){
-        ele.quantity=payload
-      }
-     return ele    
-   })
-
-   axios.patch(`${accountsUrl}/${0}`,{cart:cartNew})
-   .then((res)=>{
-    setCart(res.data.cart)
-    console.log("res after quantity change",res)
-   })
-   .catch((err)=>{console.log(err)})
-
-   
-})
 
   return (
     <div className={styles.container}>
@@ -137,13 +123,13 @@ const handleQuantityChange=((payload,id)=>{
       {cart.map((product) => (
         <div
           className={styles.productContainer}
-          key={`${product.id}${product.id}`}
+          key={`${product._id}${product._id}`}
         >
           <div className={styles.firstSection}>
             <p className={styles.title}>Item</p>
             <div className={styles.innerFirstSection}>
               <div className={styles.photoContainer}>
-                <img src={product.img.item1} alt="product" />
+                <img src={product.img} alt="product" />
               </div>
               <div className={styles.titleContainer}>
                 <p className={styles.brandName}>Boheamian Traders</p>
@@ -156,7 +142,7 @@ const handleQuantityChange=((payload,id)=>{
                   {product.name}
                 </Link>
                 <p className={styles.size}>
-                  Size: <span>{product.sizes}</span>
+                  Size: <span>{product.size}</span>
                 </p>
                 <button
                   className={styles.change}
@@ -213,18 +199,17 @@ const handleQuantityChange=((payload,id)=>{
                     className={styles.quantityBtn}
                     // decrease or remove product
                     onClick={() => {
-                      handleQuantityChange(product.quantity-1,product.id)
+                      handleQuantityChange(product._id,"dic",product)
                     }}
                   >
                     <img src={downArrow} alt="decrease" />
                   </button>
-                  <p className={styles.quantitySmall}>{/* {product.quantity} */} {product.quantity||1}</p>
+                  <p className={styles.quantitySmall}>{product.quantity}</p>
                   <button
                     className={styles.quantityBtn}
                     onClick={() => {
-                      handleQuantityChange(product.quantity+1,product.id)
-                     
-                    }}
+                      handleQuantityChange(product._id,"inc",product)
+                     }}
                   >
                     <img src={upArrow} alt="increase" />
                   </button>

@@ -1,32 +1,30 @@
-import { Box, useDisclosure,AlertDialog,AlertDialogOverlay,AlertDialogContent,AlertDialogHeader,AlertDialogBody,AlertDialogFooter, Text, Image, Grid, GridItem, Button, color, Divider } from '@chakra-ui/react'
+import { Box, useDisclosure,AlertDialog,AlertDialogOverlay,AlertDialogContent,AlertDialogHeader,AlertDialogBody,AlertDialogFooter, Text, Image, Grid, GridItem, Button, color, Divider, Toast } from '@chakra-ui/react'
 import React, { useEffect, useState } from 'react'
 import { accountsUrl } from '../../Deployed-server-url/deployed-server-url';
+import { GetAllOrder, cancelOrder } from '../../Api';
 export default function Order() {
-    const [Order, setOrder] = useState(null)
+    const [Order, setOrder] = useState([])
     const [Id, setId] = useState(null)
     const [userid, setuserid] = useState(null)
     let { isOpen, onOpen, onClose } = useDisclosure()
     const cancelRef = React.useRef()
     useEffect(() => {
-        fetch(`${accountsUrl}?login=true`).then((el) => {
-            el.json().then((data) => {
-                setOrder(data[0].orders)
-                setuserid(data[0].id)
-            });
-        })
+       GetAllOrder().then((res)=>{
+        console.log(res.data)
+        setOrder(res.data)
+       })
     }, [])
+    if(Order.length==0){
+        return <h2>order please</h2>
+    }
     function Cancel(Id){
           onClose()
-        let data = Order.splice(Id, 1);
-        let orders = Order
-        fetch(`${accountsUrl}/${userid}`, {
-            method: "PATCH",
-            body: JSON.stringify({ orders }),
-            headers: {
-                "Content-Type": "application/json"
-            },
-        })
-        setOrder(orders)
+         cancelOrder(Id).then(()=>{
+            GetAllOrder().then((res)=>{
+                setOrder(res.data)
+                
+            })
+         })
     }
     return (
         <div>
@@ -56,24 +54,24 @@ export default function Order() {
                     </AlertDialogContent>
                 </AlertDialogOverlay>
             </AlertDialog>
-            {Order ? <Box>
+            {Order.length>0 ? <Box>
                 {Order.map(function (el, i) {
                     return (
                         <GridItem alignItems={'center'} display={'flex'} textAlign={'center'} justifyContent={'space-between'} ml={'50'} mr={'50'}>
-                            <Image mt={'40px'} w={'100px'} src={el.img.item1} />
+                            <Image mt={'40px'} w={'100px'} src={el.img} />
                             <Box>
                                 <Text>
                                     {el.brand}
                                 </Text>
                                 <Text>
-                                    {el.name.toUpperCase()}
+                                    {el.name}
                                 </Text>
                                 <Text color={'red.400'}>
-                                    {el.sizes.toUpperCase()}
+                                    {el.size}
                                 </Text>
                             </Box>
                             <Text>US${el.price}</Text>
-                            <Button colorScheme='red' onClick={()=>{onOpen();setId(i)}}>Cancel</Button>
+                            <Button colorScheme='red' onClick={()=>{onOpen();setId((Id)=>el._id)}}>Cancel</Button>
                         </GridItem>
                     )
 
