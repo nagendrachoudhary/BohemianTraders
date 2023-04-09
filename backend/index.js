@@ -21,16 +21,13 @@ app.get('/products', async (req, res) => {
     try{
 
         // http://localhost:8080/products/?page=1&sort=2XS,XS,M&price_gte=10&price_lte=10000&order=All
-        let query = req.query
+    let query = req.query
     let page = query.page
     let min = query.price_gte
     let max = query.price_lte
     let size = [...query.sort]
     let order = query.order
-    if (order == "All") {
-        order = 0;
-    }
-    else if (order == "PRICE:DESCENDING") {
+    if (order == "PRICE:DESCENDING") {
         order = -1
     }
     else if(order=="PRICE:DESCENDING") {
@@ -43,17 +40,16 @@ app.get('/products', async (req, res) => {
     let skip = (query.page - 1) * 12
     if (size.length > 0) {
         if (order) {
-            let data = await product.find({ sizes: { $in: size } }).limit(12).skip(skip);
+            let data = await product.find({ sizes: { $in: size },price: { $gte: min, $lte: max } }).sort({price:order}).limit(12).skip(skip);
             res.send(data)
         }
         else {
-            let data = await product.find({ sizes: { $in: size } }).limit(12).skip(skip);
+            let data = await product.find({ sizes: { $in: size },price: { $gte: min, $lte: max } }).limit(12).skip(skip);
             res.send(data)
         }
     }
     else {
         if (order) {
-
             let data = await product.find({ price: { $gte: min, $lte: max } }).sort({ price: order }).limit(12).skip(skip)
             res.send(data)
         }
@@ -62,8 +58,9 @@ app.get('/products', async (req, res) => {
             res.send(data)
         }
     }
-}catch{
-    res.status(400).send("ERROR")
+}catch{(err)=>{
+    res.status(400).send({mess:err})
+}
 }
 })
 app.get('/products/:id', async (req, res) => {
