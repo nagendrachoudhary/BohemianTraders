@@ -6,7 +6,7 @@ import "./Navbar.css"
 import {RiAccountCircleLine} from "react-icons/ri"
 import {BsSearch} from "react-icons/bs"
 import {HiOutlineShoppingBag} from "react-icons/hi"
-import { useState,useEffect } from "react";
+import { useState,useEffect, useContext } from "react";
 import {HamburgerIcon,CloseIcon} from "@chakra-ui/icons"
 import { IconButton, Input, Modal, ModalBody, ModalCloseButton, ModalContent, ModalOverlay } from "@chakra-ui/react";
 // import { useEffect } from "react";
@@ -14,49 +14,22 @@ import { useNavigate } from "react-router-dom";
 import axios from "axios";
 import { accountsUrl } from "../Deployed-server-url/deployed-server-url";
 import { useDisclosure } from "@chakra-ui/react";
+import AuthContext from "../Context/Auth";
 
 
 export const Navbar = () =>{
-    const [User, setUser] = useState({login:false})
-    
-    useEffect(() => {
-        fetch(`${accountsUrl}?login=true`).then((el)=>{
-          el.json().then((data)=>{
-            if(data[0].login==true){
-                setUser(data[0])
-                console.log("if conditions ", data[0]);
-            }
-            else{
-                setUser({login:false})
-            }
-          });
-        })
-      }, [])
-      useEffect(()=>{
-        
-      },[User])
+    const {user,showLoginForm}=useContext(AuthContext)
+    console.log(user)
     const navigate=useNavigate()
     const [display, changeDisplay] = useState("none");
     const[title,setTitle] = useState("");
     const[match,setMatch] = useState([])
-    const[log_user_data,setLogUserData] = useState([])
-
-    const getData = () => {
-        fetch(`http://localhost:8001/accounts`)
-        .then((res) => res.json())
-        .then((resData) => setLogUserData(resData))
-    }
     const handleChange = (e) => {
         setTitle(e.target.value)
-        fetch(`http://localhost:8001/products?q=${title}`)
-        .then((res) => res.json())
-        .then((matchedData) => setMatch(matchedData))
+        // fetch(`http://localhost:8080/products?q=${title}`)
+        // .then((res) => res.json())
+        // .then((matchedData) => setMatch(matchedData))
     }
-
-    console.log(match)
-    useEffect(() => {
-        getData();
-    },[])
 
     const handleClicked = () => {
         setTitle("")
@@ -328,7 +301,7 @@ export const Navbar = () =>{
                     </Modal>
                     </Box>
                     <Box display="flex">
-                    <Link  to={User.login?"/account":"/login"}>{User.login?<Text>{User.fName}</Text>:<RiAccountCircleLine fontSize={"25px"}/>}</Link>
+                    <Link  to={showLoginForm?"/login":"/account"}>{showLoginForm?<RiAccountCircleLine fontSize={"25px"}/>:<Text>{user.fname.toUpperCase()}</Text>}</Link>
                     </Box>
                     <Box >
                     <Link to="/cart"><HiOutlineShoppingBag fontSize={"25px"}/></Link>

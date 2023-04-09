@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useContext, useEffect, useState } from 'react';
 import { Box, HStack, Button, Image, Radio, RadioGroup, Stack, Modal, ModalOverlay, ModalContent, ModalHeader, ModalFooter, ModalBody, ModalCloseButton, Text, useDisclosure, VStack, Grid } from '@chakra-ui/react'
 import './ProductDetail.css'
 import { useParams } from 'react-router-dom';
@@ -6,10 +6,13 @@ import { MoreProduct } from '../../Components/ProductDetailsCompo/MoreProduct';
 import { PDdetails } from '../../Components/ProductDetailsCompo/PDdetails';
 import { SendDataOnCart, SendDataOnWishList } from '../../Components/ProductDetailsCompo/SendData';
 import PDImg1 from '../../Components/ProductDetailsCompo/PDImg1';
-import { productsUrl, accountsUrl } from '../../Deployed-server-url/deployed-server-url';
+import { SingleproductUrl, accountsUrl } from '../../Deployed-server-url/deployed-server-url';
 import { Link } from "react-router-dom"
 import { useNavigate } from "react-router-dom";
 import { useToast } from '@chakra-ui/react'
+import axios from 'axios';
+import { AddProductInCart, SingleproductApi } from '../../Api';
+import AuthContext from '../../Context/Auth';
 
 function ProductDetail() {
   const navigate = useNavigate()
@@ -17,9 +20,8 @@ function ProductDetail() {
   const [ID, setID] = useState(id)
   let [Index, setIndex] = useState(id)
   const [value, setValue] = useState(null)
-  const [user, setUser] = useState([])
+  const {user} = useContext(AuthContext) 
   const toast = useToast()
-
   const [data, setdata] = useState({
     "id": "",
     "brand": "",
@@ -44,24 +46,11 @@ function ProductDetail() {
     "bestSelling": "",
     "featured": ""
   })
-
+  
   useEffect(() => {
-
-    fetch(`${productsUrl}/${Index}`).then((res) => {
-      res.json().then((res) => {
-        setdata(res)
-      })
+    SingleproductApi(Index).then((res) => {
+      setdata(res.data)
     })
-    fetch(`${accountsUrl}`).then((res) => { return res.json() }).then((res) => {
-      let loginUser = res.filter((el) => {
-        if (el.login == true) {
-          return el
-        }
-      })
-      setUser(loginUser)
-    })
-
-
   }, [Index])
 
   if (Index != ID) {
@@ -92,11 +81,10 @@ function ProductDetail() {
 
   function AddDATAinCart() {
     if (value) {
-      if (user.length > 0) {
-        SendDataOnCart(data, value, user);
+      if (user) {
+        AddProductInCart(Index,value)
         setOverlay(<OverlayOne />)
         onOpen()
-
         toast({
           title: 'Product Added',
           description: "",

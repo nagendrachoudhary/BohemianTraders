@@ -12,11 +12,10 @@ import { useState } from 'react'
 import { accountsUrl } from '../Deployed-server-url/deployed-server-url'
 import {useNavigate} from "react-router-dom"
 import { useEffect } from 'react'
-
-
-
+import { useContext } from 'react'
+import AuthContext from '../Context/Auth'
+import {LoginApi} from './../Api';
 export default function Login() {
-
     const navigate=useNavigate()
     const [formData,setFormData]=useState({})
     const [logedInUser,setLogedInUser]=useState({})
@@ -30,38 +29,14 @@ export default function Login() {
 
       console.log(formData)
     
-      const handleSubmit=(e)=>{
-        
-        axios.get(`${accountsUrl}?email=${formData.email}&password=${formData.password}`)
-        .then((res)=>{
-            console.log("after login filter",res)
-           if(res.data.length>0){
-              setLogedInUser(res.data[0])            
-          }
-          else{
-              alert("Login data not found plz signup")   
-          }
-       })
-        .catch(()=>{console.log("error")})
+      let {login}=useContext(AuthContext)
+      const handleSubmit=async (e)=>{
+          // LoginApi(formData.email,formData.password)
+          login(formData.email,formData.password).then(()=>{
+            navigate('/')
+
+          })
       }
-
-      useEffect(()=>{
-
-        console.log("updated user function called")
-        axios.patch(`${accountsUrl}/${id}`,{login:true})
-        .then((res)=>{
-          console.log("res after login true patch",res)
-          navigate('/')
-          window.location.reload();
-        })
-        .catch((err)=>{console.log("error after patch",err)})
-
-      },[id])
-      
-    
-
-
-
   return (
     <div>
         <Box>

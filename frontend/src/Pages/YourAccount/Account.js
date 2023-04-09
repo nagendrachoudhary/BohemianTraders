@@ -1,53 +1,35 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useContext } from 'react';
 import { Box, Menu, IconButton, MenuButton, MenuList, Grid, Text, Tabs, Image, Tab, TabList, TabPanel, TabPanels, GridItem, MenuItem } from '@chakra-ui/react'
 import { Link, Outlet, useNavigate } from 'react-router-dom';
 import { HamburgerIcon } from '@chakra-ui/icons'
 import { accountsUrl } from '../../Deployed-server-url/deployed-server-url';
+import AuthContext from '../../Context/Auth';
 function Account(props) {
     const [State, setState] = useState('ACCOUNT')
     const navigate = useNavigate()
     const [winWidth, setWinWidth] = useState(window.innerWidth)
-    const [ID, setID] = useState(null)
+    const {user,logout}=useContext(AuthContext)
+    console.log(user)
+    const [ID, setID] = useState(user)
     const detectSize = () => { setWinWidth(window.innerWidth) }
     useEffect(() => {
         window.addEventListener('resize', detectSize)
-        fetch(`${accountsUrl}?login=true`).then((res) => {
-            res.json().then((data) => {
-                if(data.length>0){
-                    setID(data[0].id)
-                }
-            })
-        })
+        
         return (() => {
             window.removeEventListener('resize', detectSize)
         })
     }, [winWidth])
     useEffect(() => {
-
         navigate('orders')
     }, [])
     function SingOut() {
-        let login = false
-        fetch(`${accountsUrl}/${ID}`, {
-
-            headers: {
-                "Content-Type": "application/json"
-            },
-            method: "PATCH",
-            body: JSON.stringify({ login })
-              
-        }).then((el) => {
-            el.json().then((el) => {
-                navigate('/')
-                window.location.reload()
-            })
-        }).catch((err) => { console.log(err) })
-         
+        logout();
+    }
+    
     
     return (
         <Box border={'1px solid red'}>
             <Box>
-
                 <Text textAlign={'left'}>HOME  /  YOUR ACCOUNT  /  {State}</Text>
                 {winWidth > 760 ? <Text mt={'30px'} textAlign={'left'} fontSize={'48px'} color={'black 300'} fontWeight={'20'}>{State}</Text> : null}
             </Box>
@@ -130,6 +112,6 @@ function Account(props) {
         </Box>
     );
 }
-}
+
 
 export default Account;

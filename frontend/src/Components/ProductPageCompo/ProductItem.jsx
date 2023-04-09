@@ -4,12 +4,11 @@ import { useNavigate } from 'react-router-dom'
 import { ImageViewContext } from '../../Context/ImageViewContextProvider/ImageViewContextProvider'
 import styles from "../../Pages/Products/styles.module.css"
 
-const ProductItem = ({id,brand,name,price,img}) => {
+const ProductItem = ({_id,brand,name,price,img}) => {
   const [reload,setReload]=useState(true)
   const navigate=useNavigate()
   const {imgView} =useContext(ImageViewContext)
   const ImgRef= useRef(null)
-
   const mouseOver=(e)=>{
     if(imgView==="model"){
       ImgRef.current.src=img.model2
@@ -28,9 +27,10 @@ const ProductItem = ({id,brand,name,price,img}) => {
     }
     setReload(!reload)
   }
-
   return (
-    <Box h={{base:'62vw',md:'36vw'}} w={{base:'100%', md:'100%'}} onClick={()=>{navigate(`/products/${id}`)}}>
+    <Box h={{base:'62vw',md:'36vw'}} w={{base:'100%', md:'100%'}} onClick={()=>{
+      console.log(_id)
+      navigate(`/product/${_id}`)}}>
       <Box h='75%' w='100%' onMouseOver={(e)=>mouseOver(e)} onMouseOut={(e)=>mouseOut(e)} >
         <Image ref={ImgRef} src={imgView==="model"&& img?img.model1:img.item1} h='100%' w='100%' />
       </Box>

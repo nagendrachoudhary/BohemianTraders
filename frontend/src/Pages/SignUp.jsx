@@ -8,21 +8,13 @@ import "./SignUp.css"
 const newData = {
     email:"",
     password:"",
-    confirmPassword:"",
     fName:"",
     lName:"",
-    company:"",
     address:"",
     city:"",
     country:"",
     state:"",
-    pinCode:"",
-    policy:"",
-    cart: [],
-    wishlist: [],
-    orders: [],
-    login:false,
-
+    pinCode:""
 }
 
 export default function SignUp() {
@@ -36,7 +28,7 @@ export default function SignUp() {
       };
 
       const handleClick = () => {
-        fetch(`${accountsUrl}`,{
+        fetch(`${accountsUrl}/create`,{
             method:"POST",
             body:JSON.stringify(form_data),
             headers:{
@@ -70,7 +62,7 @@ export default function SignUp() {
                     <Flex><FormLabel  fontSize={"12px"} fontWeight={"500"} letterSpacing="1.25px">CONFIRM PASSWORD</FormLabel>
                     <Spacer />
                 <p className='form_control'>REQUIRED</p></Flex>
-            <Input name="confirmPassword" onChange={handleChange} value={form_data.confirmPassword} border={"1px solid grey"}
+            <Input name="confirmPassword" value={form_data.confirmPassword} border={"1px solid grey"}
                         padding="8px" fontSize={"15px"} borderRadius="0px" variant={'unstyled'} type='password' /></GridItem>
             <GridItem>
                     <Flex><FormLabel  fontSize={"12px"} fontWeight={"500"} letterSpacing="1.25px">FIRST NAME</FormLabel>
@@ -86,7 +78,7 @@ export default function SignUp() {
                         padding="8px" fontSize={"15px"} borderRadius="0px" variant={'unstyled'} type='text' /></GridItem>
             <GridItem>
                     <FormLabel  fontSize={"12px"} fontWeight={"500"} letterSpacing="1.25px">COMPANY NAME</FormLabel>
-            <Input name="company" onChange={handleChange} value={form_data.company} border={"1px solid grey"}
+            <Input name="company" value={form_data.company} border={"1px solid grey"}
                         padding="8px" fontSize={"15px"} borderRadius="0px" variant={'unstyled'} type='text' /></GridItem>
             <GridItem>
                     <FormLabel  fontSize={"12px"} fontWeight={"500"} letterSpacing="1.25px">ADDRESS LINE 2nj</FormLabel>

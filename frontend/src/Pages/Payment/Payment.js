@@ -1,9 +1,10 @@
 import { Heading, Flex, Spacer, ButtonGroup, Grid, GridItem, Image, Stat, Text, Accordion, AccordionButton, AccordionIcon, AccordionPanel, Box, AccordionItem, Input, Button, Radio, Checkbox, useToast } from '@chakra-ui/react';
 import React, { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
-import { accountsUrl } from "../../Deployed-server-url/deployed-server-url"
+import { accountsUrl, productsUrl } from "../../Deployed-server-url/deployed-server-url"
 import { useNavigate } from 'react-router-dom'
 import { LineChartOutlined } from '@ant-design/icons';
+import { GetAllOrder, GetDataInCart, SendOrder } from '../../Api';
 function Payment(props) {
     const navigate = useNavigate()
     const [State, setState] = useState([])
@@ -19,14 +20,10 @@ function Payment(props) {
     let total = 0;
     const toast = useToast();
     useEffect(() => {
-        fetch(`${accountsUrl}?login=true`).then((el) => {
-            el.json().then((data) => {
-                console.log(data)
-                setState(data)
-            })
+        GetDataInCart().then((res) => {
+            setState(res.data)
         })
     }, [])
-    console.log(Coupon)
     function SubCoupon() {
         if (Coupon == 'masai' && totalCoupon == 0) {
             toast({
@@ -49,30 +46,29 @@ function Payment(props) {
     return (
         State.length > 0 ?
             <div><Grid templateColumns={['repeat(1, 1fr)', 'repeat(2, 1fr)']} w={['95%', '90%']} margin={'auto'} gap={1}>
-
                 <GridItem bg={'yellow.50'}  >
-
-                    {State[0].cart.length > 0 ? <Grid templateColumns='repeat(1, 1fr)' border={'1px solid gray'} margin={'auto'} gap={1}>
+                    <Grid templateColumns='repeat(1, 1fr)' border={'1px solid gray'} margin={'auto'} gap={1}>
                         <GridItem w={['100%']} margin={'auto'} h='50' border={'1px solid gray'} alignItems={'center'} textAlign={'center'} style={{ display: 'flex', justifyContent: 'space-between' }}>
                             <Text>Order Summary</Text>
                             <Link to={'/cart'}>Edit Cart</Link>
                         </GridItem>
-                        <GridItem Mh={'400px'} scrollBehavior={'smooth'} overflowX={'scroll'} overflowY={'noun'} >    
-                        {State[0].cart.map((el) => {
-                            total = total + (el.price * el.quantity);
-                            return <Grid  templateColumns='repeat(1, 1fr)' w={'100%'} margin={'auto'} gap={1}>
-                                <GridItem w={['100%']} margin={'auto'} style={{ display: 'flex', justifyContent: 'space-between' }}>
-                                    <Image w={'100px'} h={'100px'} src={el.img.model1} />
-                                    <GridItem w={['100%']} ml={'40px'}>
-                                        <Text>{el.name}</Text>
-                                        <Text>{el.sizes}</Text>
+                        <GridItem Mh={'400px'} scrollBehavior={'smooth'} overflowX={'scroll'} overflowY={'noun'} >
+                            {State.map((el) => {
+                                total = total + (el.price * el.quantity);
+                                el.total=el.price * el.quantity
+                                return <Grid templateColumns='repeat(1, 1fr)' w={'100%'} key={el._id} margin={'auto'} gap={1}>
+                                    <GridItem w={['100%']} margin={'auto'} style={{ display: 'flex', justifyContent: 'space-between' }}>
+                                        <Image w={'100px'} h={'100px'} src={el.img} />
+                                        <GridItem w={['100%']} ml={'40px'}>
+                                            <Text>{el.name}</Text>
+                                            <Text>{el.sizes}</Text>
+                                        </GridItem>
+                                        <GridItem style={{ display: 'flex' }} w={['100%']} ml={'40px'}>
+                                            <Text>US$  {el.quantity} * {el.price}</Text>
+                                        </GridItem>
                                     </GridItem>
-                                    <GridItem style={{ display: 'flex' }} w={['100%']} ml={'40px'}>
-                                        <Text>US$  {el.quantity} * {el.price}</Text>
-                                    </GridItem>
-                                </GridItem>
-                            </Grid>
-                        })}
+                                </Grid>
+                            })}
                         </GridItem>
                         <Grid border={'1px solid gray'}>
 
@@ -112,7 +108,7 @@ function Payment(props) {
                                 {total - totalCoupon + 10}</Text>
 
                         </GridItem>
-                    </Grid> : <Text fontSize={'50px'}>Cart id Empty</Text>}
+                    </Grid>
                 </GridItem>
                 <GridItem>
                     <Grid templateColumns='repeat(1, 1fr)' margin={'auto'} gap={1}>
@@ -143,39 +139,16 @@ function Payment(props) {
                                 <Text>Terms and Conditions</Text>
                                 <Checkbox defaultChecked>Yes, I agree with the <Link>'terms and conditions.'</Link></Checkbox>
                                 <Button w={'100%'} colorScheme='blackAlpha' textColor={'white'} onClick={(e) => {
-
-                                    let cart = State[0].cart;
-                                    let orders = State[0].orders
-                                    orders.push(...cart)
-                                    cart = [];
-                                    if (cardname.length > 0 &&
-                                        carddate.length > 0 &&
-                                        cardnumber.length > 0 &&
-                                        cardcvv.length > 0) {
-                                        let cart = State[0].cart;
-                                        let orders = State[0].orders
-                                        cart = [];
-                                        orders.push(...cart)
+                                    // cardname.length > 0 &&carddate.length > 0 &&cardnumber.length > 0 &&cardcvv.length > 0
+                                    if (cardname.length > 0 &&carddate.length > 0 &&cardnumber.length > 0 &&cardcvv.length > 0) {
+                                        let cart = State;
                                         toast({
                                             title: 'Order Placed Successfully',
                                             status: 'success',
                                             isClosable: true,
                                         })
-                                        fetch(`${accountsUrl}/${State[0].id}`, {
-                                            headers: {
-                                                "Content-Type": "application/json"
-                                            },
-                                            method: "PATCH",
-                                            body: JSON.stringify({ cart, orders })
-                                        }).then((res) => {
-                                            res.json().then((res) => {
-                                                return toast({
-                                                    title: 'Order Placed Successfully',
-                                                    status: 'success',
-                                                    isClosable: true,
-                                                })
-                                            })
-                                        })
+
+                                        SendOrder(State)
                                         navigate('/')
 
 

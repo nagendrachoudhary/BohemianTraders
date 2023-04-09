@@ -1,12 +1,33 @@
 import { background,Text, Box, Button, Grid,HStack,Input, NumberDecrementStepper, NumberIncrementStepper, NumberInput, NumberInputField, NumberInputStepper, Stack } from '@chakra-ui/react'
-import React from 'react'
+import React, { useContext, useEffect, useState } from 'react'
 import {Accordion,AccordionItem,AccordionButton,AccordionPanel } from '@chakra-ui/react'
 import {MinusIcon,AddIcon} from "@chakra-ui/icons"
 import styles from "../../Pages/Products/styles.module.css"
+import { getProducts } from '../../Redux/ProductPageRedux/prodActions'
+import { useDispatch } from 'react-redux'
+import filterContext from '../../Context/Contextfilter'
 
 const sizes= ["2XS","XS","S","M","L","XL","2XL"]
-
 const FilterBox = () => {
+ const {State,setState,AddFilters}= useContext(filterContext)
+  const [Size,setSize]= useState([]);
+  const [Price, setPrice]=useState({
+    Min:0,
+    Max:Number.MAX_SAFE_INTEGER
+  });
+  const dispatch=useDispatch();
+  useEffect(() => {
+    let id=setTimeout(() => {
+      dispatch(getProducts(State.page,Size,State._order,Price.Min,Price.Max,null,null,null,null))
+    },1000);
+    return ()=>{clearTimeout(id)}
+    },[Size,Price,State])
+
+function priceChange(e){
+  let id=setTimeout(() => {
+     setPrice({...Price,[e.target.name]:e.target.value})
+   }, 1000);
+}
   return (
     <Box  >
     <Accordion allowMultiple >
@@ -31,7 +52,21 @@ const FilterBox = () => {
               sizes.map((ele)=>{
                 return (
                   <Box>
-                   <input type="checkbox" id="sizeChoice" name="size" value={ele} style={{marginRight:"5px"}} />
+                   <input type="checkbox" id="sizeChoice" name="size" onChange={(event)=>{
+                    if(event.target.checked){
+                      setSize([...Size,event.target.value])
+                    }
+                    else{
+                      let arr=[...Size]
+                      let data=arr.filter((el,i)=>{
+                        if(el!=event.target.value){
+                          return el
+                        }
+                      })
+                      setSize((size)=>[...data])
+                    }
+                   
+                   }} value={ele} style={{marginRight:"5px"}} />
                    <label for="sizeChoice">{ele}</label>
                   </Box>
                 )
@@ -44,6 +79,7 @@ const FilterBox = () => {
   </AccordionItem>
 
   
+     
     <AccordionItem w={{base:'45vw',md:'260px'}} >
       {({ isExpanded }) => (
         <Box>
@@ -60,9 +96,10 @@ const FilterBox = () => {
             </AccordionButton>
           </h2>
           <AccordionPanel pb={4} className={styles.filterBodyStyle} >
+
             <HStack flexDirection={{base:'column',md:'row'}} >
               <NumberInput size={{base:'sm',md:'md'}}  defaultValue={'Min'} min={0} variant='ghost' >
-                <NumberInputField placeholder='Min.' fontSize={'14px'} />
+                <NumberInputField placeholder='Min.' Name="Min" onChange={priceChange} fontSize={'14px'} />
                 <NumberInputStepper>
                   <NumberIncrementStepper color={'gray'} border='none' fontSize='.8em' />
                   <NumberDecrementStepper color={'gray'} border='none' fontSize='.8em' />
@@ -70,19 +107,21 @@ const FilterBox = () => {
               </NumberInput>
 
               <NumberInput size={{base:'sm',md:'md'}}  defaultValue={'nothing'} min={0} variant='ghost' >
-                <NumberInputField placeholder='Max.' fontSize={'14px'} />
+                <NumberInputField placeholder='Max.' Name="Max" onChange={priceChange} fontSize={'14px'} />
                 <NumberInputStepper>
                   <NumberIncrementStepper color={'gray'} border='none' fontSize='.8em'/>
                   <NumberDecrementStepper color={'gray'} border='none' fontSize='.8em'/>
                 </NumberInputStepper>
               </NumberInput>
             </HStack>
-            <Box cursor={'pointer'} m={'5px'}>UPDATE</Box>
+            <Box cursor={'pointer'} m={'5px'} onClick={()=>{
+              
+            }}>UPDATE</Box>
           </AccordionPanel>
         </Box>
       )}
     </AccordionItem>
-     
+  
     <AccordionItem w={{basic:'45vw',md:'265px'}}>
     {({ isExpanded }) => (
       <Box>
