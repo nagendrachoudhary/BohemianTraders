@@ -14,7 +14,7 @@ We made this entire multipage react website in a week and tried to reach as clos
 
 1.  [Hardeep Siwach](https://www.linkedin.com/in/hardeep41016/)
     
-2.  [Nagendra Choudhary](https://github.com/nagendrachoudhary)
+2.  [Nagendra Choudhary](https://nagendrachoudhary.github.io/)
     
 3.  [Charles Galwayn](https://github.com/charlesgalwyn)
     
