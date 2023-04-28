@@ -5,7 +5,7 @@ Created `Bohemiantraders.com` clone, this is our collaborative week project with
 We made this entire multipage react website in a week and tried to reach as close as possible to the actual website, it's not fair to say that we have created the same website but from the UI perspective and by concluding all the frontend functionality, yes proudly it is a clone.
 
 [Deployment link](https://fanciful-genie-644b2c.netlify.app/)
-url=https://fanciful-genie-644b2c.netlify.app
+<a hrf="https://fanciful-genie-644b2c.netlify.app">Bohemiantraders</a>
 [Blog Link](https://krishnachaturvedi.hashnode.dev/bohemiantraderscom-website-clone)
 
 [Github repo](https://github.com/krishnachaturvedi1901/Bohemiantraders-website-clone) 
